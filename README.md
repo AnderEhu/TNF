@@ -12,9 +12,15 @@ formula
 
 ```
 
-## Benchmark format 🚀
+## Benchmark example 🚀
 
+Follwing safety formula:
+
+```
 G((p_e & s & Xs) | (-s & XXs) | (-p_e & -s & XXXs)) 
+```
+
+as input format:
 
 ```
 Initial Formula
