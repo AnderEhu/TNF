@@ -12,7 +12,9 @@ formula
 
 ```
 
-## Benchmark format for G((p_e & s & Xs) | (-s & XXs) | (-p_e & -s & XXXs)) 🚀
+## Benchmark format 🚀
+
+G((p_e & s & Xs) | (-s & XXs) | (-p_e & -s & XXXs)) 
 
 ```
 Initial Formula
