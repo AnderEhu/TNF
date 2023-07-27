@@ -8,20 +8,18 @@ Initial Formula
 formula
 
 Safety Formula
-formula1
-formula2
-  ... 
+formula
 
 ```
 
-## Benchmark format 🚀
+## Benchmark format for G((p_e & s & Xs) | (-s & XXs) | (-p_e & -s & XXXs)) 🚀
 
 ```
 Initial Formula
-s
+True
 
 Safety Formula
-p_e & s_e -> l
+(p_e & s & Xs) | (-s & XXs) | (-p_e & -s & XXXs)
 
 ```
 

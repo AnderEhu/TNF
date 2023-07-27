@@ -153,6 +153,8 @@ class TNF:
         for key, value in tnf.items():
             for v in value:
                 res_i = list(key)
+                if not v[0]:
+                    v[0] = ['True']
                 res_i.append(" && ".join(list(v[0]))) # sys
                 for futures in v[1:]: # futures
                     res_i.append(f'({" || ".join([" && ".join(list(f_i)) for f_i in futures])})')

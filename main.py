@@ -7,6 +7,7 @@ from tools import read_benchmark_file
 def execute():
 
     initial_formula, safety_formula, _ = read_benchmark_file(sys.argv[1])
+
     initial_formula_str = f'{" && ".join(initial_formula)}'
     safety_formula_str = f'{" && ".join(safety_formula)}'
 
