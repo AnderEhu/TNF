@@ -1,0 +1,7 @@
+Initial Formula
+True
+
+Safety Formula
+(p_e & s & Xs) | (-s & XXs) | (-p_e & -s & XXXs)
+
+

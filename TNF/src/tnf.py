@@ -131,8 +131,13 @@ class TNF:
         """
         Calculate TNF of given temporal formula
         """
-        print("Calculating TNF...")
-        tnf_formula = self.__tnf()        
+        print("\n------------------------")
+        print("| Calculating TNF...")
+        print("------------------------")
+
+        tnf_formula = self.__tnf()   
+
+
         return tnf_formula
 
 
@@ -142,12 +147,19 @@ class TNF:
         """
         Print TNF
         """
+        print("------------------------")
+        print("| TNF RESULT")
+        print("------------------------")
         for key, value in tnf.items():
-            print(key, ": ", len(value))
             for v in value:
-                print("============>", v)
+                res_i = list(key)
+                res_i.append(" && ".join(list(v[0]))) # sys
+                for futures in v[1:]: # futures
+                    res_i.append(f'({" || ".join([" && ".join(list(f_i)) for f_i in futures])})')
+                print(f'| {" && ".join(res_i)}')
+        print("------------------------")
+        
 
-            print("\n")
 
 
     @staticmethod
