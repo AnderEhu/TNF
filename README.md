@@ -1,5 +1,16 @@
 # Terse Normal Form
 
+# Install dependencies
+
+```
+pip install poetry
+
+```
+
+```
+poetry install
+
+```
 
 ## Benchmark format 🛠️
 

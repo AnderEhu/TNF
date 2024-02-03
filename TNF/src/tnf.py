@@ -6,10 +6,11 @@ from TemporalFormula.src.temporal_formula import TemporalFormula
 from TNF.src.separated_formula import SeparatedFormula
 from tools import print_info_map, analysis
 
+
 class TNF:
     """
         TNF formula is constructed from a temporal formula. 
-        
+
         Args: 
             - temporal_formula: string o list of lists (see TemporalFormula class) representing a temporal formula in arbitrary form
             - env_constraints_str: in case of environment constraints, it must be included as a formula (string) for the calculation of minimal coverings.
@@ -20,21 +21,21 @@ class TNF:
             - activated_print_tnf: print the result of tnf 
             - activate_verification: verifies if dnf of temporal formula is equal to TNF
     """
-    def __init__(self, temporal_formula, 
-                    env_constraints_str = None,
-                    env_constraints_ab = None,
-                    info = dict(),
-                    subsumptions = list(),
-                    inconsistencies = dict(),
-                    strToAb = dict(),
-                    env_vars = None,
-                    valid_env_valuations = None,
-                    activated_apply_subsumptions = False, 
-                    activated_print_info = False, 
-                    activated_print_tnf = False,
-                    activate_verification = False,
-                    **kwargs):
 
+    def __init__(self, temporal_formula,
+                 env_constraints_str=None,
+                 env_constraints_ab=None,
+                 info=dict(),
+                 subsumptions=list(),
+                 inconsistencies=dict(),
+                 strToAb=dict(),
+                 env_vars=None,
+                 valid_env_valuations=None,
+                 activated_apply_subsumptions=False,
+                 activated_print_info=False,
+                 activated_print_tnf=False,
+                 activate_verification=False,
+                 **kwargs):
 
         self.info = info
         self.inconsistencies = inconsistencies
@@ -42,61 +43,64 @@ class TNF:
         self.strToAb = strToAb
         self.valid_env_valuations = valid_env_valuations
         self.activated_apply_subsumptions = activated_apply_subsumptions
-        self.activated_print_info = activated_print_info 
+        self.activated_print_info = activated_print_info
         self.activated_print_tnf = activated_print_tnf
         self.activate_verification = activate_verification
         self.verification = False
 
-
-        #First, if temporal formula is an string form, it calculate the equivalent list of list representation
+        # First, if temporal formula is an string form, it calculate the equivalent list of list representation
         if isinstance(temporal_formula, str):
-            self.formula = TemporalFormula(temporal_formula, changeNegAlwaysEventually = True,  extract_negs_from_nexts = True, split_futures = False, strict_future_formulas=True).ab
+            self.formula = TemporalFormula(temporal_formula, changeNegAlwaysEventually=True,
+                                           extract_negs_from_nexts=True, split_futures=False, strict_future_formulas=True).ab
         else:
             self.formula = temporal_formula
-        
-        
-        #Then, environment minimal covering is calculated
+
+        # Then, environment minimal covering is calculated
         if env_vars:
             self.env_vars = env_vars
-            self.all_env_valuations = TemporalFormula.get_all_assignments(self.env_vars,**kwargs)
+            self.all_env_valuations = TemporalFormula.get_all_assignments(
+                self.env_vars, **kwargs)
         else:
-            self.env_vars = TemporalFormula.get_environment_current_variables(self.formula)
-            self.all_env_valuations = TemporalFormula.get_all_assignments(self.env_vars,**kwargs)
+            self.env_vars = TemporalFormula.get_environment_current_variables(
+                self.formula)
+            self.all_env_valuations = TemporalFormula.get_all_assignments(
+                self.env_vars, **kwargs)
 
         if valid_env_valuations is None:
 
             if env_constraints_str:
-                self.env_constraints = TemporalFormula(env_constraints_str, changeNegAlwaysEventually = True,  extract_negs_from_nexts = True, split_futures = False, strict_future_formulas=True, **kwargs).ab
-                self.valid_env_valuations = TemporalFormula.calculate_dnf(self.env_constraints, **kwargs)
-                self.valid_env_valuations = TemporalFormula.get_valid_env_valuations(self.all_env_valuations, self.valid_env_valuations)
+                self.env_constraints = TemporalFormula(env_constraints_str, changeNegAlwaysEventually=True,
+                                                       extract_negs_from_nexts=True, split_futures=False, strict_future_formulas=True, **kwargs).ab
+                self.valid_env_valuations = TemporalFormula.calculate_dnf(
+                    self.env_constraints, **kwargs)
+                self.valid_env_valuations = TemporalFormula.get_valid_env_valuations(
+                    self.all_env_valuations, self.valid_env_valuations)
             elif env_constraints_ab:
                 self.env_constraints = env_constraints_ab
-                self.valid_env_valuations = TemporalFormula.calculate_dnf(self.env_constraints, **kwargs)
-                self.valid_env_valuations = TemporalFormula.get_valid_env_valuations(self.all_env_valuations, self.valid_env_valuations)
+                self.valid_env_valuations = TemporalFormula.calculate_dnf(
+                    self.env_constraints, **kwargs)
+                self.valid_env_valuations = TemporalFormula.get_valid_env_valuations(
+                    self.all_env_valuations, self.valid_env_valuations)
 
             else:
                 self.valid_env_valuations = self.all_env_valuations
 
-        self.valid_env_valuations_ab = TemporalFormula.env_valuations_to_ab(self.valid_env_valuations)
-
-
+        self.valid_env_valuations_ab = TemporalFormula.env_valuations_to_ab(
+            self.valid_env_valuations)
 
         # Next, the equvialent DNF of formula is calculated
-        self.dnf = TemporalFormula.calculate_dnf(self.formula, self.info, **kwargs)
+        self.dnf = TemporalFormula.calculate_dnf(
+            self.formula, self.info, **kwargs)
 
+        # After that we transform to a separated formula representation
+        self.separated_formulas = SeparatedFormula.dnf_to_sf(
+            self.dnf, **kwargs)
 
-        #After that we transform to a separated formula representation
-        self.separated_formulas = SeparatedFormula.dnf_to_sf(self.dnf, **kwargs)
-
-
-        #Finally, we calculate the TNF  
+        # Finally, we calculate the TNF
         self.tnf_formula = self.calculate_tnf(**kwargs)
 
         self.print_info()
 
-
-
-            
     def print_info(self):
         """
         Print information about TNF, like TNF, result of verification TNF and another relative information stored in self.info dict
@@ -110,8 +114,6 @@ class TNF:
         if self.activated_print_info:
             print_info_map(self.info)
 
-
-    
     @analysis
     def verify(self, **kwargs):
         """
@@ -119,12 +121,12 @@ class TNF:
             - System variables must be deleted from  DNF and TNF formulas
             - Subsumption cant be applied neither in a particular move nor between moves
 
-        
+
         """
         tnf_as_sf = self.tnf_to_separated_formulas(self.tnf_formula, **kwargs)
-        are_equivalent = SeparatedFormula.are_equal_separated_formulas(self.separated_formulas, tnf_as_sf, env_minimal_covering=self.valid_env_valuations_ab, **kwargs)
+        are_equivalent = SeparatedFormula.are_equal_separated_formulas(
+            self.separated_formulas, tnf_as_sf, env_minimal_covering=self.valid_env_valuations_ab, **kwargs)
         return are_equivalent
-
 
     @analysis
     def calculate_tnf(self, **kwargs):
@@ -135,13 +137,10 @@ class TNF:
         print("| Calculating TNF...")
         print("------------------------")
 
-        tnf_formula = self.__tnf()   
-
+        tnf_formula = self.__tnf()
 
         return tnf_formula
 
-
-    
     @analysis
     def __print_tnf(self, tnf, **kwargs):
         """
@@ -153,16 +152,13 @@ class TNF:
         for key, value in tnf.items():
             for v in value:
                 res_i = list(key)
-                if not v[0]:
-                    v[0] = ['True']
-                res_i.append(" && ".join(list(v[0]))) # sys
-                for futures in v[1:]: # futures
-                    res_i.append(f'({" || ".join([" && ".join(list(f_i)) for f_i in futures])})')
-                print(f'| {" && ".join(res_i)}')
+                if v[0]:
+                    res_i.append(" && ".join(list(v[0])))  # sys
+                for futures in v[1:]:  # futures
+                    res_i.append(
+                        f'({" || ".join([" && ".join([ f_i_j for f_i_j in list(f_i) if  f_i_j != "X[1]True" or len(f_i) == 1]) for f_i in futures])})')
+                print(f'|| {" && ".join(res_i)}')
         print("------------------------")
-        
-
-
 
     @staticmethod
     def print_tnf(tnf, **kwargs):
@@ -176,10 +172,7 @@ class TNF:
 
             print("\n")
 
-                
-
-
-    @analysis   
+    @analysis
     def tnf_to_separated_formulas(self, tnf, **kwargs):
         """
         tnf_to_separated_formulas returns given tnf as a separated formula
@@ -187,35 +180,37 @@ class TNF:
         separated_formulas = list()
         for key, values in tnf.items():
             for value in values:
-                separated_formula = {'X':set(key), 'Y':value[0], 'Futures':value[1]}
+                separated_formula = {
+                    'X': set(key), 'Y': value[0], 'Futures': value[1]}
                 separated_formulas.append(separated_formula)
         return separated_formulas
 
     @analysis
     def __subtnf(self, formulas, **kwargs):
-
         """
         Given a list of separated formulas with same environment valuation, it calculates the TNF
-        """        
+        """
 
         if not formulas:
             return [[{'False'}, [{'X[1]False'}]]]
-        
+
         if len(formulas) == 1:
             return [[formulas[0]['Y'].copy(), formulas[0]['Futures'].copy()]]
 
+        tnf = list()
+        skip = list()  # Represent the list of literal sets already processed
+        # Represent a stack of literal sets. Moreover, top of the stack represent the current set of literals
+        literals_stack = list()
+        # Represent a stack of list of futures sets. Moreover, top of the stack represent the current set of futures
+        futures_stack = list()
+        index_stack = list()  # El conjunto
 
-        tnf = list() 
-        skip = list() # Represent the list of literal sets already processed
-        literals_stack = list() # Represent a stack of literal sets. Moreover, top of the stack represent the current set of literals
-        futures_stack = list() # Represent a stack of list of futures sets. Moreover, top of the stack represent the current set of futures
-        index_stack  = list() # El conjunto 
-
-        index_stack.append(0) #Stack top indicates current formula that is pointing
+        # Stack top indicates current formula that is pointing
+        index_stack.append(0)
         literals_stack.append(formulas[0]['Y'].copy())
         futures_stack.append(formulas[0]['Futures'].copy())
 
-        i = 1 
+        i = 1
 
         while i >= 0:
 
@@ -229,7 +224,8 @@ class TNF:
                     if union_literals != current_l:
                         current_f = futures_stack[-1]
                         union_futures = current_f[:]
-                        self.__append_future(union_futures, futures_i, **kwargs)
+                        self.__append_future(
+                            union_futures, futures_i, **kwargs)
 
                         literals_stack.append(union_literals)
                         futures_stack.append(union_futures)
@@ -238,14 +234,11 @@ class TNF:
                         current_f = futures_stack[-1]
                         self.__append_future(current_f, futures_i, **kwargs)
 
+            i += 1
 
-                    
-            i += 1  
-
-            if i == len(formulas):         
+            if i == len(formulas):
                 move_literals = literals_stack.pop()
                 move_futures = futures_stack.pop()
-                
 
                 if self.__can_be_inserted_to_tnf(move_literals, skip, **kwargs):
                     new_separated_formula = [move_literals, move_futures]
@@ -254,12 +247,13 @@ class TNF:
 
                 possible_i = index_stack.pop() + 1
 
-                i = TNF.get_valid_i(possible_i, formulas, index_stack, literals_stack, futures_stack, skip)     
+                i = TNF.get_valid_i(
+                    possible_i, formulas, index_stack, literals_stack, futures_stack, skip)
 
-        return tnf           
+        return tnf
 
     @staticmethod
-    def get_valid_i(i, formulas, index_stack, literals_stack, futures_stack, skip, recursive = True):
+    def get_valid_i(i, formulas, index_stack, literals_stack, futures_stack, skip, recursive=True):
         """
         Given a concrete state of tnf algorithm (i, formulas, index_stack, literals_stack, futures_stack, skip), 
         get_valid_i returns a valid index i, we define valid index i as follows:
@@ -270,7 +264,6 @@ class TNF:
             return TNF.__get_valid_i_r(i, formulas, index_stack, literals_stack, futures_stack, skip)
         else:
             return TNF.__get_valid_i_i(i, formulas, index_stack, literals_stack, futures_stack, skip)
-
 
     @staticmethod
     def __get_valid_i_i(i, formulas, index_stack, literals_stack, futures_stack, skip):
@@ -286,8 +279,8 @@ class TNF:
             elif i == len(formulas) and not index_stack:
                 valid_i = True
             elif formulas[i]['Y'] in skip:
-                i+=1
-            elif  i < len(formulas) and not index_stack:
+                i += 1
+            elif i < len(formulas) and not index_stack:
                 valid_i = True
                 index_stack.append(i)
                 literals_stack.append(formulas[i]['Y'].copy())
@@ -303,26 +296,28 @@ class TNF:
         """
 
         if i == len(formulas):
-            if not index_stack: 
-                # If there is no index to pop from index_stack, it means that all formulas have been visited and the algorithm must be end 
-               return -1
+            if not index_stack:
+                # If there is no index to pop from index_stack, it means that all formulas have been visited and the algorithm must be end
+                return -1
             else:
-                #Otherwise,  we pop an index from index_stack and we increment in 1. Moreover, possible_i  may not 
+                # Otherwise,  we pop an index from index_stack and we increment in 1. Moreover, possible_i  may not
                 # be a valid index due to i == len(formulas) or formulas[i]['Y'] in skip, so we call recusively to the function to ensure and generate a valid one.
                 literals_stack.pop()
                 futures_stack.pop()
                 possible_i = index_stack.pop() + 1
-                i = TNF.__get_valid_i_r(possible_i, formulas, index_stack, literals_stack, futures_stack, skip) 
+                i = TNF.__get_valid_i_r(
+                    possible_i, formulas, index_stack, literals_stack, futures_stack, skip)
                 return i
         else:
             if formulas[i]['Y'] in skip:
-                # if index i referes to a set of system variables contained in skip list, we increment in 1. Moreover, possible_i  may not 
+                # if index i referes to a set of system variables contained in skip list, we increment in 1. Moreover, possible_i  may not
                 # be a valid index due to i == len(formulas) or formulas[i]['Y'] in skip, so we call recusively to the function to ensure and generate a valid one.
                 possible_i = i + 1
-                i = TNF.__get_valid_i_r(possible_i, formulas, index_stack, literals_stack, futures_stack, skip)
+                i = TNF.__get_valid_i_r(
+                    possible_i, formulas, index_stack, literals_stack, futures_stack, skip)
                 return i
             elif not index_stack:
-                # if i < len(formulas) and is not contained in skip list, it's a valid index. 
+                # if i < len(formulas) and is not contained in skip list, it's a valid index.
                 # However, whether index_stack is empty we push:
                 #   - i to index_stack
                 #   - formulas[i]['Y'] to literals_stack
@@ -336,8 +331,6 @@ class TNF:
                 # if i < len(formulas) and is not contained in skip list, it's a valid index and as index stack is not empty, we only have to return i
                 return i
 
-                    
-
     def __append_tnf(self, tnf, new_move):
         """
         Append a new move to the tnf
@@ -347,31 +340,26 @@ class TNF:
         else:
             Subsumptions.move_lists_with_move(tnf, new_move)
 
-
-
-
-
-    
     def __tnf(self):
         """
         we calculate the tnf as the conjunction of TNF of the formulas compatible with each evaluation of the environment.
         """
-        tnf_formula = dict()  
+        tnf_formula = dict()
         for env_move in self.valid_env_valuations:
-            compatible_formulas = SeparatedFormula.get_separated_formula_compatibles_by_env(env_move, self.separated_formulas)
+            compatible_formulas = SeparatedFormula.get_separated_formula_compatibles_by_env(
+                env_move, self.separated_formulas)
             env_move_compatibles_sub_tnf = self.__subtnf(compatible_formulas)
             tnf_formula[frozenset(env_move)] = env_move_compatibles_sub_tnf
         return tnf_formula
-    
+
     @analysis
     def __can_be_inserted_to_tnf(self, possible_literals, skip, **kwargs):
-    
+
         for skip_i in skip:
             if possible_literals <= skip_i:
                 return False
         return True
 
-    
     @analysis
     def __not_visited(self, union_literals, skip, **kwargs):
         """
@@ -394,10 +382,8 @@ class TNF:
                     return False
         return True
 
-    
     @analysis
-
-    def __append_future(self,union_futures, futures_i, **kwargs):
+    def __append_future(self, union_futures, futures_i, **kwargs):
         """
         Given union_futures(a list of futures sets) and future_i (a futures set), return a list of sets 
         that represents the conjuction of union_futures and futures_i. If the verification of tnf is not activated, subsumptions
@@ -415,12 +401,5 @@ class TNF:
             if futures_i not in union_futures:
                 union_futures.append(futures_i)
         else:
-            Subsumptions.list_futures_set_with_futures_set(union_futures, futures_i)
-
-
-
-    
-
-
-
-
+            Subsumptions.list_futures_set_with_futures_set(
+                union_futures, futures_i)
