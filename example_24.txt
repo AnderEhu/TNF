@@ -2,4 +2,4 @@ Initial Formula
 True
 
 Safety Formula
-(p_e && a1 && X[1]b) || (p_e && a2 && X[1]b) || (-a2 && X[2]c) || (-p_e && F[1,4]-b)
+(p_e && a1 && X[1]b) || (p_e && a2 && X[1]b) || (-a1 && X[2]c) || (-p_e && F[1,4]-b)
