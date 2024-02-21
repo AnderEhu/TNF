@@ -155,8 +155,10 @@ class TNF:
                 if v[0]:
                     res_i.append(" && ".join(list(v[0])))  # sys
                 for futures in v[1:]:  # futures
-                    res_i.append(
-                        f'({" || ".join([" && ".join([ f_i_j for f_i_j in list(f_i) if  f_i_j != "X[1]True" or len(f_i) == 1]) for f_i in futures])})')
+                    if {'X[1]True'} not in futures:
+                        res_i.append(
+                            f'({" || ".join([" && ".join([ f_i_j for f_i_j in list(f_i) if  f_i_j != "X[1]True" or len(f_i) == 1]) for f_i in futures])})')
+
                 print(f'|| {" && ".join(res_i)}')
         print("------------------------")
 
