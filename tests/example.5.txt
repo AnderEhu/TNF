@@ -1,0 +1,9 @@
+Initial Formula
+a
+
+Safety Formula
+(p_e -> Xa)
+(-p_e -> X-a)
+
+
+

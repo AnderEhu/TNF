@@ -1,0 +1,7 @@
+Initial Formula
+True
+
+Safety Formula
+(p_e & -a & -b) | (-p_e & a & (Xd | Xc)) | (-a & b & Xd)
+
+

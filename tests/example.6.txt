@@ -1,0 +1,8 @@
+Initial Formula
+True
+
+Safety Formula
+(Xs <--> Xp_e)
+
+
+

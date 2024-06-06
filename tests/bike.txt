@@ -1,0 +1,13 @@
+Initial Formula
+True
+
+Safety Formula
+(full_e -> -rechargable)
+(-brake_e -> (-rim & -rechargable))
+(speedy_e -> -assist)
+(rechargable -> (X(-assist) & (assist -> X(-rechargable))))
+((rechargable | rim) -> -assist)
+((brake_e & -full_e) -> rechargable)
+((brake_e & full_e) -> rim)
+(G[0,2]brake_e -> X[2]( G[2,4](rechargable | rim) | (brake_e ->((rechargable | rim) & X(brake_e -> ((rechargable | rim) & X(brake_e -> (rechargable | rim))))))))
+(G[0,2]-brake_e -> X[2]( G[2,4](-speedy_e -> assist) | (-brake_e ->((-speedy_e -> assist) & X(-brake_e -> ((-speedy_e -> assist) & X(-brake_e -> (-speedy_e -> assist))))))))
